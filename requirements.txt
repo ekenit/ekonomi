@@ -1,0 +1,6 @@
+pandas
+matplotlib
+typer
+sklearn
+scikit-learn
+openpyxl

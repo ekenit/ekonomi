@@ -96,8 +96,6 @@ def process_bank_files(folder_path):
         else:
             print(f"Unknown bank for the file: {file}")
             continue
-        combined_df = combined_df.append(processed_df, ignore_index=True)
+        combined_df = combined_df._append(processed_df, ignore_index=True)
     return combined_df
-
-
 
