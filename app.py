@@ -6,11 +6,13 @@ from visualization import *
 from database_handler import *
 from machine_learning import *
 from utils import *
+import pandas as pd
 
 app = typer.Typer()
 
 @app.command()
-def show_most_common_expenses(number: int = typer.Option(10, help="Number of top expenses to show")):
+def show_most_common_expenses(number: int = typer.Option(10, help="Number of top expenses to show"),
+                              export_csv: bool = typer.Option(False, help="Export to CSV")):
     query = """
     SELECT 
         Inköpsställe, COUNT(*) as Antal_Transaktioner, SUM(Belopp) as Total_Belopp
@@ -27,6 +29,35 @@ def show_most_common_expenses(number: int = typer.Option(10, help="Number of top
     results = execute_sql_query(query, (number,))
     display_db_with_rich("Most Common Expenses", results, ["Purchase Place", "Number of Transactions", "Total Amount"])
 
+    if export_csv:
+        df = pd.DataFrame(results, columns=["Purchase Place", "Number of Transactions", "Total Amount"])
+        df.to_csv("most_common_expenses.csv", index=False)
+        typer.echo("Data exported to most_common_expenses.csv")
+
+
+@app.command()
+def show_most_common_income(number: int = typer.Option(10, help="Number of top income sources to show"),
+                            export_csv: bool = typer.Option(False, help="Export to CSV")):
+    query = """
+    SELECT 
+        Inköpsställe, COUNT(*) as Antal_Transaktioner, SUM(Belopp) as Total_Belopp
+    FROM 
+        transaktioner 
+    WHERE 
+        Belopp > 0
+    GROUP BY 
+        Inköpsställe
+    ORDER BY 
+        Antal_Transaktioner DESC, Total_Belopp ASC
+    LIMIT ?
+    """ 
+    results = execute_sql_query(query, (number,))
+    display_db_with_rich("Most Common Income Sources", results, ["Purchase Place", "Number of Transactions", "Total Amount"])
+
+    if export_csv:
+        df = pd.DataFrame(results, columns=["Purchase Place", "Number of Transactions", "Total Amount"])
+        df.to_csv("most_common_income.csv", index=False)
+        typer.echo("Data exported to most_common_income.csv")
 
 @app.command()
 def show_economic_trend():
