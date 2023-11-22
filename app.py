@@ -10,6 +10,43 @@ from utils import *
 app = typer.Typer()
 
 @app.command()
+def show_most_common_expenses(number: int = typer.Option(10, help="Number of top expenses to show")):
+    query = """
+    SELECT 
+        Inköpsställe, COUNT(*) as Antal_Transaktioner, SUM(Belopp) as Total_Belopp
+    FROM 
+        transaktioner 
+    WHERE 
+        Belopp < 0
+    GROUP BY 
+        Inköpsställe
+    ORDER BY 
+        Antal_Transaktioner DESC, Total_Belopp ASC
+    LIMIT ?
+    """
+    results = execute_sql_query(query, (number,))
+    display_db_with_rich("Most Common Expenses", results, ["Purchase Place", "Number of Transactions", "Total Amount"])
+
+
+@app.command()
+def show_economic_trend():
+    query = """
+    SELECT 
+        strftime('%Y-%m', Transaktionsdatum) AS Månad, 
+        SUM(CASE WHEN Belopp > 0 THEN Belopp ELSE 0 END) AS Total_Inkomst,
+        SUM(CASE WHEN Belopp < 0 THEN Belopp ELSE 0 END) AS Total_Utgift,
+        SUM(CASE WHEN Inköpsställe LIKE 'ISK%' OR Inköpsställe LIKE 'Buffert%' OR Inköpsställe LIKE 'spar%' THEN Belopp ELSE 0 END) AS Total_Sparande
+    FROM 
+        transaktioner 
+    GROUP BY 
+        Månad
+    ORDER BY 
+        Månad
+    """
+    results = execute_sql_query(query)
+    display_db_with_rich("Economic Trend per Month", results, ["Month", "Total Income", "Total Expense", "Total Savings"])
+
+@app.command()
 def show_most_common_expenses(number: int = typer.Option(500, help="Number of top expenses to show")):
     results = calculate_most_common_expenses(number)
     display_most_common_expenses(results)
@@ -18,6 +55,16 @@ def show_most_common_expenses(number: int = typer.Option(500, help="Number of to
 def show_economic_trend():
     results = calculate_economic_trend()
     display_economic_trend(results)
+
+
+@app.command()
+def show_future_flows():
+    results = extrapolate_future(total_df)
+
+
+@app.command()
+def show_regression_flows():
+    results = linear_regression_forecast(total_df)
 
 @app.command()
 def show_largest_transactions(type: str = typer.Argument(..., help="Specify 'income' or 'expenses'"), 

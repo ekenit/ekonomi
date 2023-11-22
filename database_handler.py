@@ -34,3 +34,19 @@ def consolidate_entries(df, lookup_dict):
 def create_database_connection():
     return sqlite3.connect('database.db')
 
+
+
+def execute_sql_query(query, parameters=()):
+    """
+    Executes a SQL query and returns the results.
+
+    :param query: The SQL query to execute.
+    :param parameters: Optional parameters for the query.
+    :return: Query results as a list of tuples.
+    """
+    conn = create_database_connection()  # Assuming this function is already defined
+    cursor = conn.cursor()
+    cursor.execute(query, parameters)
+    results = cursor.fetchall()
+    conn.close()
+    return results
