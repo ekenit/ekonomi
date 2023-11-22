@@ -29,3 +29,8 @@ def consolidate_entries(df, lookup_dict):
     for existing_name, new_name in lookup_dict.items():
         df.loc[df['Inköpsställe'] == existing_name, 'Inköpsställe'] = new_name
     return df
+
+
+def create_database_connection():
+    return sqlite3.connect('database.db')
+

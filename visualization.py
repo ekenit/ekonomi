@@ -64,7 +64,7 @@ def display_database_with_rich(title, data):
     :param data: List of tuples representing database rows.
     """
     table = Table(title=title)
-    column_names = ["Date", "TransactionCode", "", "Amount"]
+    column_names = ["Datum", "Transaktionskod", "", "Belopp"]
 
     for col in column_names:
         table.add_column(col)
@@ -75,3 +75,32 @@ def display_database_with_rich(title, data):
 
     console = Console()
     console.print(table)
+
+
+def display_db_with_rich(title, data, column_headers):
+    """
+    Displays database query results in a table format using the rich library.
+
+    :param title: Title of the table.
+    :param data: Data to be displayed (list of tuples).
+    :param column_headers: List of column headers for the table.
+    """
+    table = Table(title=title)
+    for header in column_headers:
+        table.add_column(header, justify="center")
+
+    for row in data:
+        formatted_row = [str(item) for item in row]
+        table.add_row(*formatted_row)
+
+    console = Console()
+    console.print(table)
+
+def display_economic_trend(results):
+    column_headers = ["Month", "Total Income", "Total Expense", "Total Savings"]
+    display_db_with_rich("Economic Trend per Month", results, column_headers)
+
+
+def display_most_common_expenses(results):
+    column_headers = ["Purchase Place", "Number of Transactions", "Total Amount"]
+    display_db_with_rich("Most Common Expenses", results, column_headers)

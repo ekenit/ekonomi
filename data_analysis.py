@@ -1,6 +1,9 @@
 # Data Analysis Module
 import pandas as pd
 import numpy as np
+from database_handler import create_database_connection
+
+
 
 def calculate_average_change(df):
     """ Calculates and returns the average change in amount over time. """
@@ -59,4 +62,51 @@ def segmentera_data(df):
     # Code for segmenting data into savings and expenses...
     pass
 
-# Other related functions...
+
+def calculate_economic_trend():
+    conn = create_database_connection()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT 
+        strftime('%Y-%m', Transaktionsdatum) AS Månad, 
+        SUM(CASE WHEN Belopp > 0 THEN Belopp ELSE 0 END) AS Total_Inkomst,
+        SUM(CASE WHEN Belopp < 0 THEN Belopp ELSE 0 END) AS Total_Utgift,
+        SUM(CASE WHEN Inköpsställe LIKE 'ISK%' OR Inköpsställe LIKE 'Buffert%' OR Inköpsställe LIKE 'spar%' THEN Belopp ELSE 0 END) AS Total_Sparande
+    FROM 
+        transaktioner 
+    GROUP BY 
+        Månad
+    ORDER BY 
+        Månad
+    """
+    
+    cursor.execute(query)
+    results = cursor.fetchall()
+
+    conn.close()
+    return results
+
+def calculate_most_common_expenses(number: int = 10):
+    conn = create_database_connection()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT 
+        Inköpsställe, COUNT(*) as Antal_Transaktioner, SUM(Belopp) as Totalt_Belopp
+    FROM 
+        transaktioner 
+    WHERE 
+        Belopp < 0
+    GROUP BY 
+        Inköpsställe
+    ORDER BY 
+        Antal_Transaktioner DESC, Totalt_Belopp ASC
+    LIMIT ?
+    """
+    
+    cursor.execute(query, (number,))
+    results = cursor.fetchall()
+
+    conn.close()
+    return results
