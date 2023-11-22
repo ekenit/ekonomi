@@ -90,6 +90,11 @@ def show_economic_trend():
 
 @app.command()
 def show_future_flows():
+    filepath = 'expenses'
+    total_df = process_bank_files(filepath)
+
+    total_df = consolidate_entries(total_df, expenses_mapping)
+    handle_database(total_df, 'database.db')
     results = extrapolate_future(total_df)
 
 
@@ -119,11 +124,7 @@ def show_largest_transactions(type: str = typer.Argument(..., help="Specify 'inc
 
 #@app.command()
 def main():
-    filepath = 'expenses'
-    total_df = process_bank_files(filepath)
 
-    total_df = consolidate_entries(total_df, expenses_mapping)
-    handle_database(total_df, 'database.db')
     app()
 
     #aggregated_ammount = aggregate_by_month(total_df)
