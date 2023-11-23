@@ -122,6 +122,37 @@ def show_largest_transactions(type: str = typer.Argument(..., help="Specify 'inc
     
     conn.close()
 
+@app.command()
+def analyze_expenses(purchase_place: str):
+    """
+    Analyzes expenses for a specific purchase place to find out the most common day and time.
+
+    :param purchase_place: The name of the purchase place to analyze.
+    """
+    results = show_expense_analysis(purchase_place)
+        # Convert numerical weekdays to names
+
+
+@app.command()
+def show_datetime_samples(sample_size: int = typer.Option(5, help="Number of datetime samples to show")):
+    """
+    Displays a sample of datetime entries from the transactions database.
+
+    :param sample_size: Number of samples to display.
+    """
+    query = """
+    SELECT 
+        Transaktionsdatum
+    FROM 
+        transaktioner
+    LIMIT ?
+    """
+    results = execute_sql_query(query, (sample_size,))
+    for i, (date_sample,) in enumerate(results):
+        typer.echo(f"Sample {i + 1}: {date_sample}")
+
+
+
 #@app.command()
 def main():
 
