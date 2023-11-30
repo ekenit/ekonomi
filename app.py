@@ -100,6 +100,11 @@ def show_future_flows():
 
 @app.command()
 def show_regression_flows():
+    filepath = 'expenses'
+    total_df = process_bank_files(filepath)
+
+    total_df = consolidate_entries(total_df, expenses_mapping)
+    handle_database(total_df, 'database.db')
     results = linear_regression_forecast(total_df)
 
 @app.command()

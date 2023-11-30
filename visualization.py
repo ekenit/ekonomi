@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 from rich.console import Console
 from rich.table import Table
-
+import plotly.graph_objects as go
 
 def presentera_data_med_rich(title, data):
     # Code for presenting data with rich...
@@ -14,7 +14,7 @@ def plot_data(data):
 
 import matplotlib.pyplot as plt
 
-def plot_time_series(historical_dates, historical_data, forecast_dates, forecast_data, title, xlabel, ylabel):
+def plot_time_series_matplot(historical_dates, historical_data, forecast_dates, forecast_data, title, xlabel, ylabel):
     """
     Plots time series data including historical data and forecasts.
 
@@ -36,7 +36,30 @@ def plot_time_series(historical_dates, historical_data, forecast_dates, forecast
     plt.grid(True)
     plt.show()
 
+def plot_time_series(historical_dates, historical_data, forecast_dates, forecast_data, title, xlabel, ylabel):
+    """
+    Plots time series data including historical data and forecasts interactively using Plotly.
 
+    :param historical_dates: Dates for the historical data.
+    :param historical_data: Historical data points.
+    :param forecast_dates: Dates for the forecast data.
+    :param forecast_data: Forecast data points.
+    :param title: Title of the plot.
+    :param xlabel: Label for the x-axis.
+    :param ylabel: Label for the y-axis.
+    """
+    fig = go.Figure()
+
+    # Historical Data
+    fig.add_trace(go.Scatter(x=historical_dates, y=historical_data, mode='lines', name='Historical Data'))
+
+    # Forecast Data
+    fig.add_trace(go.Scatter(x=forecast_dates, y=forecast_data, mode='lines', name='Forecast', line=dict(dash='dash')))
+
+    # Update plot layout
+    fig.update_layout(title=title, xaxis_title=xlabel, yaxis_title=ylabel, legend_title="Legend", hovermode="x")
+
+    fig.show()
 
 def display_data_with_rich(title, data):
     """
